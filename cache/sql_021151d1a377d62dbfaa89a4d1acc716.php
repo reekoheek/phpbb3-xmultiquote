@@ -1,8 +1,8 @@
 <?php exit; ?>
-1298638663
+1298653297
 SELECT s.style_id, c.theme_id, c.theme_data, c.theme_path, c.theme_name, c.theme_mtime, i.*, t.template_path FROM phpbb_styles s, phpbb_styles_template t, phpbb_styles_theme c, phpbb_styles_imageset i WHERE s.style_id = 1 AND t.template_id = s.template_id AND c.theme_id = s.theme_id AND i.imageset_id = s.imageset_id
-70763
-a:1:{i:0;a:11:{s:8:"style_id";s:1:"1";s:8:"theme_id";s:1:"1";s:10:"theme_data";s:70376:"/*  phpBB 3.0 Style Sheet
+71166
+a:1:{i:0;a:11:{s:8:"style_id";s:1:"1";s:8:"theme_id";s:1:"1";s:10:"theme_data";s:70779:"/*  phpBB 3.0 Style Sheet
     --------------------------------------------------------------
 	Style name:		proSilver
 	Based on style:	proSilver (this is the default phpBB 3 style)
@@ -3769,4 +3769,19 @@ input.search {
 input.disabled {
 	color: #666666;
 }
-";s:10:"theme_path";s:9:"prosilver";s:10:"theme_name";s:9:"prosilver";s:11:"theme_mtime";s:10:"1298638004";s:11:"imageset_id";s:1:"1";s:13:"imageset_name";s:9:"prosilver";s:18:"imageset_copyright";s:18:"&copy; phpBB Group";s:13:"imageset_path";s:9:"prosilver";s:13:"template_path";s:9:"prosilver";}}
+/* FIXME xmultiquote */
+ul.profile-icons li.xquote-icon, ul.profile-icons li.xquoted-icon {
+    margin-top: 5px !important;
+}
+
+ul.profile-icons li.xquote-icon a, ul.profile-icons li.xquoted-icon span {
+    border:1px solid black;
+    background-color: #fff;
+    display:inline !important;
+    padding: 1px 2px 1px 2px;
+}
+
+ul.profile-icons li.xquoted-icon span {
+    background-color: #0f0 !important;
+}
+";s:10:"theme_path";s:9:"prosilver";s:10:"theme_name";s:9:"prosilver";s:11:"theme_mtime";s:10:"1298650059";s:11:"imageset_id";s:1:"1";s:13:"imageset_name";s:9:"prosilver";s:18:"imageset_copyright";s:18:"&copy; phpBB Group";s:13:"imageset_path";s:9:"prosilver";s:13:"template_path";s:9:"prosilver";}}

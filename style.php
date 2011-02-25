@@ -156,17 +156,15 @@ if ($id)
 			ob_start('ob_gzhandler');
 		}
 	}
-
+    
 	// Expire time of seven days if not recached
 	$expire_time = 7*86400;
 	$recache = false;
-
 	// Re-cache stylesheet data if necessary
 	if ($recompile || empty($theme['theme_data']))
 	{
 		$recache = (empty($theme['theme_data'])) ? true : false;
 		$update_time = time();
-
 		// We test for stylesheet.css because it is faster and most likely the only file changed on common themes
 		if (!$recache && $theme['theme_mtime'] < @filemtime("{$phpbb_root_path}styles/" . $theme['theme_path'] . '/theme/stylesheet.css'))
 		{

@@ -17,6 +17,9 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
 include($phpbb_root_path . 'includes/bbcode.' . $phpEx);
+// FIXME xmultiquote
+include($phpbb_root_path . 'includes/xmultiquote/functions.' . $phpEx);
+// xmultiquote
 
 // Start session management
 $user->session_begin();
@@ -1320,7 +1323,6 @@ $prev_post_id = '';
 $template->assign_vars(array(
 	'S_NUM_POSTS' => sizeof($post_list))
 );
-
 // Output the posts
 $first_unread = $post_unread = false;
 for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
@@ -1567,6 +1569,18 @@ for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
 	{
 		$postrow = array_merge($postrow, $cp_row['row']);
 	}
+
+//    echo '<pre>';
+//    print_r(xmultiquote_get_xmessages());
+//    echo '</pre>';
+    // FIXME xmultiquote use $config[is_allow_xmultiquote]
+    if (xmultiquote_is_quoted($postrow)) {
+        $postrow['X_QUOTE'] = NULL;
+    } else {
+        $postrow['X_QUOTE'] = './posting.php?mode=multiquote&f='.$_GET['f'].'&p='.$postrow['POST_ID'];
+    }
+//    print_r($postrow['X_QUOTE']);
+    //
 
 	// Dump vars into template
 	$template->assign_block_vars('postrow', $postrow);

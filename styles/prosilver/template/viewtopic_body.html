@@ -131,6 +131,10 @@
 					<!-- IF postrow.U_WARN --><li class="warn-icon"><a href="{postrow.U_WARN}" title="{L_WARN_USER}"><span>{L_WARN_USER}</span></a></li><!-- ENDIF -->
 					<!-- IF postrow.U_INFO --><li class="info-icon"><a href="{postrow.U_INFO}" title="{L_INFORMATION}"><span>{L_INFORMATION}</span></a></li><!-- ENDIF -->
 					<!-- IF postrow.U_QUOTE --><li class="quote-icon"><a href="{postrow.U_QUOTE}" title="{L_REPLY_WITH_QUOTE}"><span>{L_REPLY_WITH_QUOTE}</span></a></li><!-- ENDIF -->
+                    <!-- FIXME xmultiquote -->
+                    <!-- IF not postrow.X_QUOTE --><li class="xquoted-icon"><span>Multi Quoted</span></li><!-- ENDIF -->
+                    <!-- IF postrow.X_QUOTE --><li class="xquote-icon"><a href="{postrow.X_QUOTE}" title="{L_REPLY_WITH_QUOTE}">Multi Quote</a></li><!-- ENDIF -->
+                    <!-- // -->
 				</ul>
 			<!-- ENDIF -->
 		<!-- ENDIF -->
