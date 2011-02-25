@@ -1570,16 +1570,13 @@ for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
 		$postrow = array_merge($postrow, $cp_row['row']);
 	}
 
-//    echo '<pre>';
-//    print_r(xmultiquote_get_xmessages());
-//    echo '</pre>';
     // FIXME xmultiquote use $config[is_allow_xmultiquote]
-    if (xmultiquote_is_quoted($postrow)) {
-        $postrow['X_QUOTE'] = NULL;
+    $postrow['X_IS_QUOTE'] = xmultiquote_is_quoted($postrow);
+    if ($postrow['X_IS_QUOTE']) {
+        $postrow['X_QUOTE'] = './posting.php?mode=multiquote&f='.$_GET['f'].'&p='.$postrow['POST_ID'].'&delete=1';
     } else {
         $postrow['X_QUOTE'] = './posting.php?mode=multiquote&f='.$_GET['f'].'&p='.$postrow['POST_ID'];
     }
-//    print_r($postrow['X_QUOTE']);
     //
 
 	// Dump vars into template

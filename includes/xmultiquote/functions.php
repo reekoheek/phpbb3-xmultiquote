@@ -22,10 +22,14 @@ function xmultiquote_get_xmessage_string() {
 }
 
 function xmultiquote_set_xmessages($post_data, $xmessage) {
-    $xmessages = xmultiquote_get_xmessages();
-    if (!xmultiquote_is_quoted($post_data)) {
+    $xmessages = get_object_vars(xmultiquote_get_xmessages());
+    if (!xmultiquote_is_quoted($post_data) && !empty($xmessage)) {
         $key = xmultiquote_get_key($post_data);
-        $xmessages->$key = $xmessage;
+        $xmessages[$key] = $xmessage;
+        setcookie('xmultiquote_xmessages', json_encode($xmessages, JSON_FORCE_OBJECT), 0, '/');
+    } else if (xmultiquote_is_quoted($post_data) && empty($xmessage)) {
+        $key = xmultiquote_get_key($post_data);
+        unset($xmessages[$key]);
         setcookie('xmultiquote_xmessages', json_encode($xmessages, JSON_FORCE_OBJECT), 0, '/');
     }
 }

@@ -51,6 +51,9 @@ $current_time = time();
 // Was cancel pressed? If so then redirect to the appropriate page
 if ($cancel || ($current_time - $lastclick < 2 && $submit))
 {
+    // FIXME xmultiquote
+    setcookie('xmultiquote_xmessages', NULL, 0, '/');
+
 	$f = ($forum_id) ? 'f=' . $forum_id . '&amp;' : '';
 	$redirect = ($post_id) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", $f . 'p=' . $post_id) . '#p' . $post_id : (($topic_id) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", $f . 't=' . $topic_id) : (($forum_id) ? append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id) : append_sid("{$phpbb_root_path}index.$phpEx")));
 	redirect($redirect);
@@ -1312,8 +1315,11 @@ if (($mode == 'quote' || $mode == 'multiquote') && !$submit && !$preview && !$re
 
     // FIXME xmultiquote: config allow_xmultiquote here
     if ($mode == 'multiquote') {
-        xmultiquote_set_xmessages($post_data, $message_parser->message);
-        $message_parser->message = xmultiquote_get_xmessage_string();
+        if (@$_GET['delete']) {
+            xmultiquote_set_xmessages($post_data, NULL);
+        } else {
+            xmultiquote_set_xmessages($post_data, $message_parser->message);
+        }
         header('Location: '.$_SERVER['HTTP_REFERER']);
         exit;
     }
