@@ -1,0 +1,14 @@
+Multi quote plugin for phpBB3
+
+Changes:
+./styles/prosilver/theme/stylesheet.css
+./styles/prosilver/theme/xmultiquote.css ()
+./styles/prosilver/template/viewtopic_body.html
+./viewtopic.php
+./includes/xmultiquote/functions.php
+./posting.php
+
+Produce with bash command:
+<pre>
+find . -type f | xargs grep xmultiquote | cut -d":" -f1 | awk '!x[$0]++' | grep -e "^\./[a-zA-Z0-9]"  > README
+</pre>
