@@ -1572,11 +1572,6 @@ for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
 
     // FIXME xmultiquote use $config[is_allow_xmultiquote]
     $postrow['X_IS_QUOTE'] = xmultiquote_is_quoted($postrow);
-    if ($postrow['X_IS_QUOTE']) {
-        $postrow['X_QUOTE'] = './posting.php?mode=multiquote&f='.$_GET['f'].'&p='.$postrow['POST_ID'].'&delete=1';
-    } else {
-        $postrow['X_QUOTE'] = './posting.php?mode=multiquote&f='.$_GET['f'].'&p='.$postrow['POST_ID'];
-    }
     //
 
 	// Dump vars into template

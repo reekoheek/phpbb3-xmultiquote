@@ -51,16 +51,12 @@ $current_time = time();
 // Was cancel pressed? If so then redirect to the appropriate page
 if ($cancel || ($current_time - $lastclick < 2 && $submit))
 {
-    // FIXME xmultiquote
-    setcookie('xmultiquote_xmessages', NULL, 0, '/');
-
 	$f = ($forum_id) ? 'f=' . $forum_id . '&amp;' : '';
 	$redirect = ($post_id) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", $f . 'p=' . $post_id) . '#p' . $post_id : (($topic_id) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", $f . 't=' . $topic_id) : (($forum_id) ? append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id) : append_sid("{$phpbb_root_path}index.$phpEx")));
 	redirect($redirect);
 }
 
-// FIXME xmultiquote
-if (in_array($mode, array('post', 'reply', 'quote', 'multiquote', 'edit', 'delete')) && !$forum_id)
+if (in_array($mode, array('post', 'reply', 'quote', 'edit', 'delete')) && !$forum_id)
 {
 	trigger_error('NO_FORUM');
 }
@@ -100,8 +96,6 @@ switch ($mode)
 	break;
 
 	case 'quote':
-    // FIXME xmultiquote
-    case 'multiquote':
 	case 'edit':
 	case 'delete':
 		if (!$post_id)
@@ -174,8 +168,7 @@ if (!$post_data)
 
 // Not able to reply to unapproved posts/topics
 // TODO: add more descriptive language key
-// FIXME xmultiquote
-if ($auth->acl_get('m_approve', $forum_id) && ((($mode == 'reply' || $mode == 'bump') && !$post_data['topic_approved']) || (($mode == 'quote' || $mode == 'multiquote') && !$post_data['post_approved'])))
+if ($auth->acl_get('m_approve', $forum_id) && ((($mode == 'reply' || $mode == 'bump') && !$post_data['topic_approved']) || ($mode == 'quote' && !$post_data['post_approved'])))
 {
 	trigger_error(($mode == 'reply' || $mode == 'bump') ? 'TOPIC_UNAPPROVED' : 'POST_UNAPPROVED');
 }
@@ -245,8 +238,6 @@ switch ($mode)
 		}
 	break;
 	case 'quote':
-    // FIXME xmultiquote
-    case 'multiquote':
 
 		$post_data['post_edit_locked'] = 0;
 
@@ -276,8 +267,7 @@ switch ($mode)
 
 if (!$is_authed)
 {
-    // FIXME xmultiquote
-	$check_auth = ($mode == 'quote' || $mode == 'multiquote') ? 'reply' : $mode;
+	$check_auth = ($mode == 'quote') ? 'reply' : $mode;
 
 	if ($user->data['is_registered'])
 	{
@@ -288,8 +278,7 @@ if (!$is_authed)
 }
 
 // Is the user able to post within this forum?
-// FIXME xmultiquote
-if ($post_data['forum_type'] != FORUM_POST && in_array($mode, array('post', 'bump', 'quote', 'multiquote', 'reply')))
+if ($post_data['forum_type'] != FORUM_POST && in_array($mode, array('post', 'bump', 'quote', 'reply')))
 {
 	trigger_error('USER_CANNOT_FORUM_POST');
 }
@@ -391,13 +380,11 @@ else
 
 $post_data['post_edit_locked']	= (isset($post_data['post_edit_locked'])) ? (int) $post_data['post_edit_locked'] : 0;
 $post_data['post_subject_md5']	= (isset($post_data['post_subject']) && $mode == 'edit') ? md5($post_data['post_subject']) : '';
-// FIXME xmultiquote
-$post_data['post_subject']		= (in_array($mode, array('quote', 'multiquote', 'edit'))) ? $post_data['post_subject'] : ((isset($post_data['topic_title'])) ? $post_data['topic_title'] : '');
+$post_data['post_subject']		= (in_array($mode, array('quote', 'edit'))) ? $post_data['post_subject'] : ((isset($post_data['topic_title'])) ? $post_data['topic_title'] : '');
 $post_data['topic_time_limit']	= (isset($post_data['topic_time_limit'])) ? (($post_data['topic_time_limit']) ? (int) $post_data['topic_time_limit'] / 86400 : (int) $post_data['topic_time_limit']) : 0;
 $post_data['poll_length']		= (!empty($post_data['poll_length'])) ? (int) $post_data['poll_length'] / 86400 : 0;
 $post_data['poll_start']		= (!empty($post_data['poll_start'])) ? (int) $post_data['poll_start'] : 0;
-// FIXME xmultiquote
-$post_data['icon_id']			= (!isset($post_data['icon_id']) || in_array($mode, array('quote', 'multiquote', 'reply'))) ? 0 : (int) $post_data['icon_id'];
+$post_data['icon_id']			= (!isset($post_data['icon_id']) || in_array($mode, array('quote', 'reply'))) ? 0 : (int) $post_data['icon_id'];
 $post_data['poll_options']		= array();
 
 // Get Poll Data
@@ -470,12 +457,12 @@ if ($post_data['post_attachment'] && !$submit && !$refresh && !$preview && $mode
 }
 
 if ($post_data['poster_id'] == ANONYMOUS)
-{   // FIXME xmultiquote
-	$post_data['username'] = ($mode == 'quote' || $mode == 'multiquote' || $mode == 'edit') ? trim($post_data['post_username']) : '';
+{   
+	$post_data['username'] = ($mode == 'quote' || $mode == 'edit') ? trim($post_data['post_username']) : '';
 }
 else
-{   // FIXME xmultiquote
-	$post_data['username'] = ($mode == 'quote' || $mode == 'multiquote' || $mode == 'edit') ? trim($post_data['username']) : '';
+{   
+	$post_data['username'] = ($mode == 'quote' || $mode == 'edit') ? trim($post_data['username']) : '';
 }
 
 $post_data['enable_urls'] = $post_data['enable_magic_url'];
@@ -491,8 +478,7 @@ if ($mode != 'edit')
 $post_data['enable_magic_url'] = $post_data['drafts'] = false;
 
 // User own some drafts?
-// FIXME xmultiquote
-if ($user->data['is_registered'] && $auth->acl_get('u_savedrafts') && ($mode == 'reply' || $mode == 'post' || $mode == 'quote' || $mode == 'multiquote'))
+if ($user->data['is_registered'] && $auth->acl_get('u_savedrafts') && ($mode == 'reply' || $mode == 'post' || $mode == 'quote' ))
 {
 	$sql = 'SELECT draft_id
 		FROM ' . DRAFTS_TABLE . '
@@ -538,8 +524,7 @@ $flash_status	= ($bbcode_status && $auth->acl_get('f_flash', $forum_id) && $conf
 $quote_status	= true;
 
 // Save Draft
-// FIXME xmultiquote
-if ($save && $user->data['is_registered'] && $auth->acl_get('u_savedrafts') && ($mode == 'reply' || $mode == 'post' || $mode == 'quote' || $mode == 'multiquote'))
+if ($save && $user->data['is_registered'] && $auth->acl_get('u_savedrafts') && ($mode == 'reply' || $mode == 'post' || $mode == 'quote' ))
 {
 	$subject = utf8_normalize_nfc(request_var('subject', '', true));
 	$subject = (!$subject && $mode != 'post') ? $post_data['topic_title'] : $subject;
@@ -561,6 +546,9 @@ if ($save && $user->data['is_registered'] && $auth->acl_get('u_savedrafts') && (
 
 			$meta_info = ($mode == 'post') ? append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id) : append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");
 
+            // FIXME xmultiquote
+            xmultiquote_clear_xmessages();
+            
 			meta_refresh(3, $meta_info);
 
 			$message = $user->lang['DRAFT_SAVED'] . '<br /><br />';
@@ -642,8 +630,7 @@ if ($save && $user->data['is_registered'] && $auth->acl_get('u_savedrafts') && (
 }
 
 // Load requested Draft
-// FIXME xmultiquote
-if ($draft_id && ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote' || $mode == 'post') && $user->data['is_registered'] && $auth->acl_get('u_savedrafts'))
+if ($draft_id && ($mode == 'reply' || $mode == 'quote' || $mode == 'post') && $user->data['is_registered'] && $auth->acl_get('u_savedrafts'))
 {
 	$sql = 'SELECT draft_subject, draft_message
 		FROM ' . DRAFTS_TABLE . "
@@ -667,8 +654,7 @@ if ($draft_id && ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote' 
 }
 
 // Load draft overview
-// FIXME xmultiquote
-if ($load && ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote' || $mode == 'post') && $post_data['drafts'])
+if ($load && ($mode == 'reply' || $mode == 'quote' || $mode == 'post') && $post_data['drafts'])
 {
 	load_drafts($topic_id, $forum_id);
 }
@@ -764,8 +750,7 @@ if ($submit || $preview || $refresh)
 	// If replying/quoting and last post id has changed
 	// give user option to continue submit or return to post
 	// notify and show user the post made between his request and the final submit
-    // FIXME xmultiquote
-	if (($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote') && $post_data['topic_cur_post_id'] && $post_data['topic_cur_post_id'] != $post_data['topic_last_post_id'])
+	if (($mode == 'reply' || $mode == 'quote') && $post_data['topic_cur_post_id'] && $post_data['topic_cur_post_id'] != $post_data['topic_last_post_id'])
 	{
 		// Only do so if it is allowed forum-wide
 		if ($post_data['forum_flags'] & FORUM_FLAG_POST_REVIEW)
@@ -887,8 +872,7 @@ if ($submit || $preview || $refresh)
 		}
 	}
 
-    // FIXME xmultiquote
-	if ($config['enable_post_confirm'] && !$user->data['is_registered'] && in_array($mode, array('quote', 'multiquote', 'post', 'reply')))
+	if ($config['enable_post_confirm'] && !$user->data['is_registered'] && in_array($mode, array('quote', 'post', 'reply')))
 	{
 		$captcha_data = array(
 			'message'	=> utf8_normalize_nfc(request_var('message', '', true)),
@@ -1157,7 +1141,9 @@ if ($submit || $preview || $refresh)
 			$redirect_url = submit_post($mode, $post_data['post_subject'], $post_data['username'], $post_data['topic_type'], $poll, $data, $update_message, ($update_message || $update_subject) ? true : false);
 
             // FIXME xmultiquote
-			if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($captcha) && $captcha->is_solved() === true) && ($mode == 'post' || $mode == 'reply' || $mode == 'quote' || $mode == 'multiquote'))
+            xmultiquote_clear_xmessages();
+            
+			if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($captcha) && $captcha->is_solved() === true) && ($mode == 'post' || $mode == 'reply' || $mode == 'quote'))
 			{
 				$captcha->reset();
 			}
@@ -1285,12 +1271,10 @@ if (!sizeof($error) && $preview)
 }
 
 // Decode text for message display
-// FIXME xmultiquote
-$post_data['bbcode_uid'] = (($mode == 'quote' || $mode == 'multiquote') && !$preview && !$refresh && !sizeof($error)) ? $post_data['bbcode_uid'] : $message_parser->bbcode_uid;
+$post_data['bbcode_uid'] = (($mode == 'quote') && !$preview && !$refresh && !sizeof($error)) ? $post_data['bbcode_uid'] : $message_parser->bbcode_uid;
 $message_parser->decode_message($post_data['bbcode_uid']);
 
-// FIXME xmultiquote
-if (($mode == 'quote' || $mode == 'multiquote') && !$submit && !$preview && !$refresh)
+if (($mode == 'quote') && !$submit && !$preview && !$refresh)
 {
 	if ($config['allow_bbcode'])
 	{
@@ -1312,26 +1296,12 @@ if (($mode == 'quote' || $mode == 'multiquote') && !$submit && !$preview && !$re
 		$message = str_replace("\n", "\n" . $quote_string, $message);
 		$message_parser->message =  $post_data['quote_username'] . " " . $user->lang['WROTE'] . ":\n" . $message . "\n";
 	}
-
-    // FIXME xmultiquote: config allow_xmultiquote here
-    if ($mode == 'multiquote') {
-        if (@$_GET['delete']) {
-            xmultiquote_set_xmessages($post_data, NULL);
-        } else {
-            xmultiquote_set_xmessages($post_data, $message_parser->message);
-        }
-        header('Location: '.$_SERVER['HTTP_REFERER']);
-        exit;
-    }
-//    echo '</pre>';
 }
-//print_r('|'.$refresh.'|');
-// FIXME xmultiquote
-if (($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote') && !$submit && !$preview && !$refresh)
+
+if (($mode == 'reply' || $mode == 'quote') && !$submit && !$preview && !$refresh)
 {
     // FIXME xmultiquote
     $message_parser->message = xmultiquote_get_xmessage_string();
-//    print_r($message_parser->message);
 	$post_data['post_subject'] = ((strpos($post_data['post_subject'], 'Re: ') !== 0) ? 'Re: ' : '') . censor_text($post_data['post_subject']);
 }
 
@@ -1404,8 +1374,6 @@ switch ($mode)
 	break;
 
 	case 'quote':
-    // FIXME xmultiquote
-    case 'multiquote':
 	case 'reply':
 		$page_title = $user->lang['POST_REPLY'];
 	break;
@@ -1423,8 +1391,7 @@ generate_forum_nav($post_data);
 generate_forum_rules($post_data);
 
 // Posting uses is_solved for legacy reasons. Plugins have to use is_solved to force themselves to be displayed.
-// FIXME xmultiquote
-if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($captcha) && $captcha->is_solved() === false) && ($mode == 'post' || $mode == 'reply' || $mode == 'quote' || $mode == 'multiquote'))
+if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($captcha) && $captcha->is_solved() === false) && ($mode == 'post' || $mode == 'reply' || $mode == 'quote'))
 {
 
 	$template->assign_vars(array(
@@ -1433,8 +1400,7 @@ if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($c
 	));
 }
 
-// FIXME xmultiquote
-$s_hidden_fields = ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote') ? '<input type="hidden" name="topic_cur_post_id" value="' . $post_data['topic_last_post_id'] . '" />' : '';
+$s_hidden_fields = ($mode == 'reply' || $mode == 'quote') ? '<input type="hidden" name="topic_cur_post_id" value="' . $post_data['topic_last_post_id'] . '" />' : '';
 $s_hidden_fields .= '<input type="hidden" name="lastclick" value="' . $current_time . '" />';
 $s_hidden_fields .= ($draft_id || isset($_REQUEST['draft_loaded'])) ? '<input type="hidden" name="draft_loaded" value="' . request_var('draft_loaded', $draft_id) . '" />' : '';
 
@@ -1458,16 +1424,14 @@ add_form_key('posting');
 // Start assigning vars for main posting page ...
 $template->assign_vars(array(
 	'L_POST_A'					=> $page_title,
-    // FIXME xmultiquote
-	'L_ICON'					=> ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote' || ($mode == 'edit' && $post_id != $post_data['topic_first_post_id'])) ? $user->lang['POST_ICON'] : $user->lang['TOPIC_ICON'],
+	'L_ICON'					=> ($mode == 'reply' || $mode == 'quote' || ($mode == 'edit' && $post_id != $post_data['topic_first_post_id'])) ? $user->lang['POST_ICON'] : $user->lang['TOPIC_ICON'],
 	'L_MESSAGE_BODY_EXPLAIN'	=> (intval($config['max_post_chars'])) ? sprintf($user->lang['MESSAGE_BODY_EXPLAIN'], intval($config['max_post_chars'])) : '',
 
 	'FORUM_NAME'			=> $post_data['forum_name'],
 	'FORUM_DESC'			=> ($post_data['forum_desc']) ? generate_text_for_display($post_data['forum_desc'], $post_data['forum_desc_uid'], $post_data['forum_desc_bitfield'], $post_data['forum_desc_options']) : '',
 	'TOPIC_TITLE'			=> censor_text($post_data['topic_title']),
 	'MODERATORS'			=> (sizeof($moderators)) ? implode(', ', $moderators[$forum_id]) : '',
-    // FIXME xmultiquote
-	'USERNAME'				=> ((!$preview && ( $mode != 'quote' || $mode != 'multiquote' )) || $preview) ? $post_data['username'] : '',
+	'USERNAME'				=> ((!$preview && $mode != 'quote') || $preview) ? $post_data['username'] : '',
 	'SUBJECT'				=> $post_data['post_subject'],
 	'MESSAGE'				=> $post_data['post_text'],
 	'BBCODE_STATUS'			=> ($bbcode_status) ? sprintf($user->lang['BBCODE_IS_ON'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>') : sprintf($user->lang['BBCODE_IS_OFF'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>'),
@@ -1501,8 +1465,7 @@ $template->assign_vars(array(
 	'S_SIGNATURE_CHECKED'		=> ($sig_checked) ? ' checked="checked"' : '',
 	'S_NOTIFY_ALLOWED'			=> (!$user->data['is_registered'] || ($mode == 'edit' && $user->data['user_id'] != $post_data['poster_id']) || !$config['allow_topic_notify'] || !$config['email_enable']) ? false : true,
 	'S_NOTIFY_CHECKED'			=> ($notify_checked) ? ' checked="checked"' : '',
-    // FIXME xmultiquote
-	'S_LOCK_TOPIC_ALLOWED'		=> (($mode == 'edit' || $mode == 'reply' || $mode == 'quote' || $mode == 'multiquote' ) && ($auth->acl_get('m_lock', $forum_id) || ($auth->acl_get('f_user_lock', $forum_id) && $user->data['is_registered'] && !empty($post_data['topic_poster']) && $user->data['user_id'] == $post_data['topic_poster'] && $post_data['topic_status'] == ITEM_UNLOCKED))) ? true : false,
+	'S_LOCK_TOPIC_ALLOWED'		=> (($mode == 'edit' || $mode == 'reply' || $mode == 'quote') && ($auth->acl_get('m_lock', $forum_id) || ($auth->acl_get('f_user_lock', $forum_id) && $user->data['is_registered'] && !empty($post_data['topic_poster']) && $user->data['user_id'] == $post_data['topic_poster'] && $post_data['topic_status'] == ITEM_UNLOCKED))) ? true : false,
 	'S_LOCK_TOPIC_CHECKED'		=> ($lock_topic_checked) ? ' checked="checked"' : '',
 	'S_LOCK_POST_ALLOWED'		=> ($mode == 'edit' && $auth->acl_get('m_edit', $forum_id)) ? true : false,
 	'S_LOCK_POST_CHECKED'		=> ($lock_post_checked) ? ' checked="checked"' : '',
@@ -1561,8 +1524,7 @@ $template->set_filenames(array(
 make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
 
 // Topic review
-// FIXME xmultiquote
-if ($mode == 'reply' || $mode == 'quote' || $mode == 'multiquote')
+if ($mode == 'reply' || $mode == 'quote')
 {
 	if (topic_review($topic_id, $forum_id))
 	{
