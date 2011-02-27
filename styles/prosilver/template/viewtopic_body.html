@@ -132,8 +132,8 @@
                 <!-- IF postrow.U_INFO --><li class="info-icon"><a href="{postrow.U_INFO}" title="{L_INFORMATION}"><span>{L_INFORMATION}</span></a></li><!-- ENDIF -->
                 <!-- IF postrow.U_QUOTE --><li class="quote-icon"><a href="{postrow.U_QUOTE}" title="{L_REPLY_WITH_QUOTE}"><span>{L_REPLY_WITH_QUOTE}</span></a></li><!-- ENDIF -->
                 <!-- FIXME xmultiquote -->
-                <!-- IF postrow.X_IS_QUOTE --><li class="xquoted-icon"><a href="javascript:xmultiquote_quote({postrow.POST_ID}, false, this);" postId="{postrow.POST_ID}" title="{L_REPLY_WITH_QUOTE}">MULTIQUOTED</a></li><!-- ENDIF -->
-                <!-- IF not postrow.X_IS_QUOTE --><li class="xquote-icon"><a href="javascript:xmultiquote_quote({postrow.POST_ID}, true, this);" postId="{postrow.POST_ID}" title="{L_REPLY_WITH_QUOTE}">MULTIQUOTE</a></li><!-- ENDIF -->
+                <!-- IF postrow.X_IS_QUOTE --><li class="xmultiquote"><a href="#" postId="{postrow.POST_ID}" title="{L_REPLY_WITH_QUOTE}" class="xquoted-icon">MULTIQUOTED</a></li><!-- ENDIF -->
+                <!-- IF not postrow.X_IS_QUOTE --><li class="xmultiquote"><a href="#" postId="{postrow.POST_ID}" title="{L_REPLY_WITH_QUOTE}" class="xquote-icon">MULTIQUOTE</a></li><!-- ENDIF -->
                 <!-- // -->
             </ul>
             <!-- ENDIF -->

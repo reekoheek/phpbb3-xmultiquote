@@ -1,9 +1,9 @@
 /* FIXME xmultiquote */
-ul.profile-icons li.xquote-icon, ul.profile-icons li.xquoted-icon {
+ul.profile-icons .xmultiquote {
     margin-top: 4px !important;
 }
 
-ul.profile-icons li.xquote-icon a, ul.profile-icons li.xquoted-icon a {
+ul.profile-icons .xquote-icon, ul.profile-icons .xquoted-icon {
     font-weight: bold;
     border:1px solid #333;
     background-color: #fff;
@@ -21,7 +21,7 @@ ul.profile-icons li.xquote-icon a, ul.profile-icons li.xquoted-icon a {
     background: -moz-linear-gradient(top,  #fff,  #aaa); /* for firefox 3.6+ */
 }
 
-ul.profile-icons li.xquoted-icon a {
+ul.profile-icons .xquoted-icon {
     background-color: #0f0 !important;
 
     background: #ccc; /* for non-css3 browsers */

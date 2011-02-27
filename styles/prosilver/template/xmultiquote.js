@@ -57,15 +57,15 @@ function xmultiquote_quote(postId, isQuote) {
 }
 
 $(function() {
-    $('.xquote-icon a, .xquoted-icon a').click(function(evt) {
+    $('.xquote-icon, .xquoted-icon').click(function(evt) {
         evt.preventDefault();
-        var tobeQuote = $(this).parent().hasClass('xquote-icon');
+        var tobeQuote = $(this).hasClass('xquote-icon');
 
         if (xmultiquote_quote($(this).attr('postId'), tobeQuote)) {
             if (tobeQuote) {
-                $(this).html('MULTIQUOTED').parent().removeClass('xquote-icon').addClass('xquoted-icon');
+                $(this).html('MULTIQUOTED').removeClass('xquote-icon').addClass('xquoted-icon');
             } else {
-                $(this).html('MULTIQUOTE').parent().removeClass('xquoted-icon').addClass('xquote-icon');
+                $(this).html('MULTIQUOTE').removeClass('xquoted-icon').addClass('xquote-icon');
             }
         }
         return false;
