@@ -10,6 +10,10 @@ function xmultiquote_get_xmessages() {
     $xmessages = array();
     if (isset($_COOKIE['xmultiquote_xmessages'])) {
         $xmessages = json_decode($_COOKIE['xmultiquote_xmessages']);
+        if (is_object($xmessages)) {
+            xmultiquote_clear_xmessages();
+            $xmessages = array();
+        }
     }
     return $xmessages;
 }
