@@ -111,6 +111,7 @@ switch ($mode)
 		$result = $db->sql_query($sql);
 		$f_id = (int) $db->sql_fetchfield('forum_id');
 		$db->sql_freeresult($result);
+
 		$forum_id = (!$f_id) ? $forum_id : $f_id;
 
 		$sql = 'SELECT f.*, t.*, p.*, u.username, u.username_clean, u.user_sig, u.user_sig_bbcode_uid, u.user_sig_bbcode_bitfield
@@ -237,6 +238,7 @@ switch ($mode)
 			$is_authed = true;
 		}
 	break;
+
 	case 'quote':
 
 		$post_data['post_edit_locked'] = 0;
@@ -547,7 +549,7 @@ if ($save && $user->data['is_registered'] && $auth->acl_get('u_savedrafts') && (
 			$meta_info = ($mode == 'post') ? append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id) : append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");
 
             // FIXME xmultiquote
-            xmultiquote_clear_xmessages();
+            xmultiquote_clear();
             
 			meta_refresh(3, $meta_info);
 
@@ -1141,7 +1143,7 @@ if ($submit || $preview || $refresh)
 			$redirect_url = submit_post($mode, $post_data['post_subject'], $post_data['username'], $post_data['topic_type'], $poll, $data, $update_message, ($update_message || $update_subject) ? true : false);
 
             // FIXME xmultiquote
-            xmultiquote_clear_xmessages();
+            xmultiquote_clear();
             
 			if ($config['enable_post_confirm'] && !$user->data['is_registered'] && (isset($captcha) && $captcha->is_solved() === true) && ($mode == 'post' || $mode == 'reply' || $mode == 'quote'))
 			{
@@ -1271,10 +1273,10 @@ if (!sizeof($error) && $preview)
 }
 
 // Decode text for message display
-$post_data['bbcode_uid'] = (($mode == 'quote') && !$preview && !$refresh && !sizeof($error)) ? $post_data['bbcode_uid'] : $message_parser->bbcode_uid;
+$post_data['bbcode_uid'] = ($mode == 'quote' && !$preview && !$refresh && !sizeof($error)) ? $post_data['bbcode_uid'] : $message_parser->bbcode_uid;
 $message_parser->decode_message($post_data['bbcode_uid']);
 
-if (($mode == 'quote') && !$submit && !$preview && !$refresh)
+if ($mode == 'quote' && !$submit && !$preview && !$refresh)
 {
 	if ($config['allow_bbcode'])
 	{
@@ -1300,8 +1302,13 @@ if (($mode == 'quote') && !$submit && !$preview && !$refresh)
 
 if (($mode == 'reply' || $mode == 'quote') && !$submit && !$preview && !$refresh)
 {
+
     // FIXME xmultiquote
-    $message_parser->message = xmultiquote_get_xmessage_string();
+    if ($mode != 'quote' && $draft_id == 0) {
+        $message_parser->message = xmultiquote_get_xmessage_string($message_parser);
+    }
+    // FIXME xmultiquote
+
 	$post_data['post_subject'] = ((strpos($post_data['post_subject'], 'Re: ') !== 0) ? 'Re: ' : '') . censor_text($post_data['post_subject']);
 }
 
@@ -1421,6 +1428,7 @@ if (isset($captcha) && $captcha->is_solved() !== false)
 $form_enctype = (@ini_get('file_uploads') == '0' || strtolower(@ini_get('file_uploads')) == 'off' || !$config['allow_attachments'] || !$auth->acl_get('u_attach') || !$auth->acl_get('f_attach', $forum_id)) ? '' : ' enctype="multipart/form-data"';
 add_form_key('posting');
 
+
 // Start assigning vars for main posting page ...
 $template->assign_vars(array(
 	'L_POST_A'					=> $page_title,
@@ -1531,6 +1539,7 @@ if ($mode == 'reply' || $mode == 'quote')
 		$template->assign_var('S_DISPLAY_REVIEW', true);
 	}
 }
+
 page_footer();
 
 /**

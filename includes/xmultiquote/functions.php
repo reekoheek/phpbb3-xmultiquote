@@ -6,19 +6,19 @@
  *
  * @author jafar
  */
-function xmultiquote_get_xmessages() {
+function xmultiquote_get_ids() {
     $xmessages = array();
     if (isset($_COOKIE['xmultiquote_xmessages'])) {
         $xmessages = json_decode($_COOKIE['xmultiquote_xmessages']);
         if (is_object($xmessages)) {
-            xmultiquote_clear_xmessages();
+            xmultiquote_clear();
             $xmessages = array();
         }
     }
     return $xmessages;
 }
 
-function xmultiquote_get_xmessage($post_id) {
+function xmultiquote_get_post($post_id) {
     global $db, $auth;
     $sql = 'SELECT forum_id
 			FROM ' . POSTS_TABLE . '
@@ -50,13 +50,13 @@ function xmultiquote_get_xmessage($post_id) {
     return $post_data;
 }
 
-function xmultiquote_get_xmessage_string() {
+function xmultiquote_get_xmessage_string($message_parser) {
     global $config;
-    $ids = xmultiquote_get_xmessages();
+    $ids = xmultiquote_get_ids();
 
     $xmessages = array();
     foreach ($ids as $id) {
-        $post_data = xmultiquote_get_xmessage($id);
+        $post_data = xmultiquote_get_post($id);
 
         if ($config['allow_bbcode']) {
             $message = '[quote=&quot;' . $post_data['quote_username'] . '&quot;]' . censor_text(trim($post_data['post_text'])) . "[/quote]\n";
@@ -75,42 +75,30 @@ function xmultiquote_get_xmessage_string() {
             $message =  $post_data['quote_username'] . " " . $user->lang['WROTE'] . ":\n" . $message . "\n";
         }
 
+        $message_parser->message = $message;
+        $message_parser->decode_message($post_data['bbcode_uid']);
+
+        $message = $message_parser->message;
+
         $xmessages[] = $message;
     }
 
     return implode("\n\n", $xmessages);
 }
 
-function xmultiquote_set_xmessages($post_data, $xmessage) {
-    $xmessages = get_object_vars(xmultiquote_get_xmessages());
-    if (!xmultiquote_is_quoted($post_data) && !empty($xmessage)) {
-        $key = xmultiquote_get_key($post_data);
-        $xmessages[$key] = $xmessage;
-        setcookie('xmultiquote_xmessages', json_encode($xmessages, JSON_FORCE_OBJECT), 0, '/');
-    } else if (xmultiquote_is_quoted($post_data) && empty($xmessage)) {
-        $key = xmultiquote_get_key($post_data);
-        unset($xmessages[$key]);
-        setcookie('xmultiquote_xmessages', json_encode($xmessages, JSON_FORCE_OBJECT), 0, '/');
-    }
-}
-
-function xmultiquote_get_key($post_data) {
+function xmultiquote_is_quoted($post_data) {
     $key = $post_data['post_id'];
     if (empty($key)) {
         $key = $post_data['POST_ID'];
     }
-
     if (empty($key)) {
         echo "Terjadi error";
         return false;
     }
-    return intval($key);
-}
-
-function xmultiquote_is_quoted($post_data) {
-    $key = xmultiquote_get_key($post_data);
+    $key = intval($key);
+    
     if ($key) {
-        $xmessages = xmultiquote_get_xmessages();
+        $xmessages = xmultiquote_get_ids();
 
         if (array_search($key, $xmessages) !== false) {
             return true;
@@ -121,6 +109,6 @@ function xmultiquote_is_quoted($post_data) {
     return false;
 }
 
-function xmultiquote_clear_xmessages() {
+function xmultiquote_clear() {
     setcookie('xmultiquote_xmessages', NULL, 0, '/');
 }

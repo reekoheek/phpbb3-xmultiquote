@@ -1,7 +1,6 @@
 function xmultiquote_quote(postId, isQuote) {
     var toJSON = function(arr) {
-        return '[' + arr.join(',') + ']';
-        
+        return '[' + arr.join(',') + ']';        
     };
 
     var getCookie= function(key, isRaw) {
