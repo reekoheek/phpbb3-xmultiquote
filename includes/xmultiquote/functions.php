@@ -24,9 +24,12 @@ function xmultiquote_get_post($post_id) {
 			FROM ' . POSTS_TABLE . '
 			WHERE post_id = ' . $post_id;
     $result = $db->sql_query($sql);
-    $f_id = (int) $db->sql_fetchfield('forum_id');
+//    echo '<pre>';
+//    print_r($db->sql_fetchrow());
+//    echo '</pre>';
+    $forum_id = (int) $db->sql_fetchfield('forum_id');
     $db->sql_freeresult($result);
-    $forum_id = (!$f_id) ? $forum_id : $f_id;
+//    $forum_id = (!$f_id) ? $forum_id : $f_id;
 
     $sql = 'SELECT f.*, t.*, p.*, u.username, u.username_clean, u.user_sig, u.user_sig_bbcode_uid, u.user_sig_bbcode_bitfield
 			FROM ' . POSTS_TABLE . ' p, ' . TOPICS_TABLE . ' t, ' . FORUMS_TABLE . ' f, ' . USERS_TABLE . " u
